@@ -1,7 +1,10 @@
+import io
+
 from hyperlpr import *
 import sys
 import importlib
 import cv2
+from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import filedialog
 
@@ -9,6 +12,7 @@ from tkinter import filedialog
 class Car:
     def __init__(self):
         self.path = ''
+        self.path_ = ''
         self.window = tk.Tk()
         self.window.title('车牌识别')
         fm1 = tk.Frame(self.window)
@@ -33,28 +37,25 @@ class Car:
         self.fm2.pack(side=tk.TOP)
         fm3.pack(side=tk.TOP)
 
-
     def selectPath(self):
-        self.path = filedialog.askopenfilename()
-        self.E1.setvar(self.path)
-
+        self.path_ = filedialog.askopenfilename()
+        self.path.set(self.path_)
 
     def readpic(self):
-        image = cv2.imread(self.path)
+        image = cv2.imread(self.path_)
         self.detect(image)
         self.Lbot1['text'] = HyperLPR_PlateRecogntion(image)[0][0]
-        cv2.imwrite('img.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY),70])
-        # img = tk.PhotoImage(file='img.jpg')
-        # label_img = tk.Label(self.window, image=img)
-        # label_img.pack()
+        cv2.imwrite('img.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
+        img = Image.open('img.jpg', 'r')
+        ph = ImageTk.PhotoImage(img)
+        label_img = tk.Label(self.window, image=ph)
+        label_img.pack()
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-
 
     def run(self):
         importlib.reload(sys)
         self.window.mainloop()
-
 
     def detect(self, image):
         # 定义分类器
@@ -82,4 +83,3 @@ class Car:
 if __name__ == '__main__':
     car = Car()
     car.run()
-
