@@ -11,10 +11,12 @@ from tkinter import filedialog
 
 class Car:
     def __init__(self):
+        self.flag = 0
         self.path = ''
         self.path_ = ''
         self.window = tk.Tk()
         self.window.title('车牌识别')
+        self.label_img = tk.Label(self.window)
         fm1 = tk.Frame(self.window)
         self.fm2 = tk.Frame(self.window)
         fm3 = tk.Frame(self.window)
@@ -36,6 +38,7 @@ class Car:
         fm1.pack(side=tk.TOP)
         self.fm2.pack(side=tk.TOP)
         fm3.pack(side=tk.TOP)
+        self.label_img.pack()
 
     def selectPath(self):
         self.path_ = filedialog.askopenfilename()
@@ -43,13 +46,16 @@ class Car:
 
     def readpic(self):
         image = cv2.imread(self.path_)
-        self.detect(image)
+        plate = self.detect(image)
         self.Lbot1['text'] = HyperLPR_PlateRecogntion(image)[0][0]
-        cv2.imwrite('img.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
+        cv2.imwrite('img.jpg', plate, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
+
         img = Image.open('img.jpg', 'r')
+        global ph
         ph = ImageTk.PhotoImage(img)
-        label_img = tk.Label(self.window, image=ph)
-        label_img.pack()
+        self.label_img["image"]=ph
+
+
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -78,6 +84,7 @@ class Car:
                 # cv2.imshow("plate", plate)
                 cv2.rectangle(image, (x - 2, y - 2), (x + w + 2, y + h + 2), (255, 0, 0), 2)
         # cv2.imshow("image", image)
+        return plate
 
 
 if __name__ == '__main__':
