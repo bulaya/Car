@@ -47,7 +47,10 @@ class Car:
     def readpic(self):
         image = cv2.imread(self.path_)
         plate = self.detect(image)
-        self.Lbot1['text'] = HyperLPR_PlateRecogntion(image)[0][0]
+        try:
+            self.Lbot1['text'] = "车牌：" + HyperLPR_PlateRecogntion(image)[0][0]
+        except IndexError:
+            self.Lbot1['text'] = '车牌：识别失败'
         cv2.imwrite('img.jpg', plate, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
 
         img = Image.open('img.jpg', 'r')
@@ -55,9 +58,6 @@ class Car:
         ph = ImageTk.PhotoImage(img)
         self.label_img["image"]=ph
 
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
     def run(self):
         importlib.reload(sys)
@@ -80,10 +80,9 @@ class Car:
         if len(car_plates) > 0:
             for car_plate in car_plates:
                 x, y, w, h = car_plate
-                plate = image[y - 2: y + h + 2, x - 2: x + w + 2]
+                plate = image[y - 5: y + h + 5, x - 5: x + w + 5]
                 # cv2.imshow("plate", plate)
-                cv2.rectangle(image, (x - 2, y - 2), (x + w + 2, y + h + 2), (255, 0, 0), 2)
-        # cv2.imshow("image", image)
+                cv2.rectangle(image, (x - 5, y - 5), (x + w + 5, y + h + 5), (255, 0, 0), 2)
         return plate
 
 
